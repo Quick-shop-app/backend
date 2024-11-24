@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,7 +28,7 @@ import ugr.dss.quick_shop.models.ProductDto;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller
-@RequestMapping("/products")
+@RequestMapping({ "/products" })
 public class ProductsController {
 
     @Autowired
@@ -37,148 +38,25 @@ public class ProductsController {
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("products", products);
-        return "products/index";
+        return "products";
     }
 
-    @GetMapping("/create")
-    public String createProductPage(Model model) {
-        ProductDto productDto = new ProductDto();
-        model.addAttribute("productDto", productDto);
+    // @PostMapping("/add-to-cart")
+    // public String addToCart(@RequestParam("productId") Long productId, Model
+    // model) {
+    // Product product = productsRepository.findById(productId).orElse(null);
+    // if (product == null) {
+    // model.addAttribute("error", "Product not found");
+    // return "redirect:/products";
+    // }
+    // // Logic to add the product to the cart
+    // // For example, you can add the product to a session attribute representing
+    // the
+    // // cart
+    // // session.setAttribute("cart", cart);
 
-        return "products/create";
-    }
-
-    @PostMapping("/create")
-    public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "products/create";
-        }
-
-        MultipartFile imageFile = productDto.getImageFile();
-        Date createdDate = new Date();
-        String fileName = createdDate.getTime() + "_product_" + imageFile.getOriginalFilename();
-        try {
-            String uploadDir = "public/images/";
-            Path uploadPath = Paths.get(uploadDir);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            try (InputStream inputStream = imageFile.getInputStream()) {
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving image file: " + e.getMessage());
-        }
-
-        Product product = new Product();
-        product.setName(productDto.getName());
-        product.setBrand(productDto.getBrand());
-        product.setCategory(productDto.getCategory());
-        product.setPrice(productDto.getPrice());
-        product.setDescription(productDto.getDescription());
-        product.setImage(fileName);
-        product.setCreatedAt(createdDate);
-
-        productsRepository.save(product);
-
-        return "redirect:/products/index";
-    }
-
-    @GetMapping("/edit")
-    public String editProductPage(Model model, @RequestParam("id") int id) {
-        try {
-            Product product = productsRepository.findById(id).get();
-            model.addAttribute("product", product);
-
-            ProductDto productDto = new ProductDto();
-            productDto.setName(product.getName());
-            productDto.setBrand(product.getBrand());
-            productDto.setCategory(product.getCategory());
-            productDto.setPrice(product.getPrice());
-            productDto.setDescription(product.getDescription());
-
-            model.addAttribute("productDto", productDto);
-        } catch (Exception e) {
-            System.out.println("Error getting product: " + e.getMessage());
-        }
-        return "products/edit";
-    }
-
-    @PostMapping("/edit")
-    public String editProduct(Model model, @Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult,
-            @RequestParam("id") int id) {
-        try {
-            Date updatedAt = new Date();
-            Product product = productsRepository.findById(id).get();
-            model.addAttribute("product", product);
-
-            if (bindingResult.hasErrors()) {
-                return "products/edit";
-            }
-
-            if (!productDto.getImageFile().isEmpty() && productDto.getImageFile() != null) {
-                MultipartFile imageFile = productDto.getImageFile();
-                String fileName = updatedAt.getTime() + "_product_" + imageFile.getOriginalFilename();
-                try {
-                    String uploadDir = "public/images/";
-                    Path uploadPath = Paths.get(uploadDir);
-
-                    if (!Files.exists(uploadPath)) {
-                        Files.createDirectories(uploadPath);
-                    }
-
-                    try (InputStream inputStream = imageFile.getInputStream()) {
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-                    }
-
-                    String oldImage = product.getImage();
-                    if (oldImage != null && !oldImage.isEmpty()) {
-                        Path oldFilePath = uploadPath.resolve(oldImage);
-                        Files.delete(oldFilePath);
-                    }
-                } catch (IOException e) {
-                    System.out.println("Error saving image file: " + e.getMessage());
-                }
-                product.setImage(fileName);
-            }
-
-            product.setId(id);
-            product.setName(productDto.getName());
-            product.setBrand(productDto.getBrand());
-            product.setCategory(productDto.getCategory());
-            product.setPrice(productDto.getPrice());
-            product.setDescription(productDto.getDescription());
-            product.setUpdatedAt(updatedAt);
-
-            productsRepository.save(product);
-        } catch (Exception e) {
-            System.out.println("Error updating product: " + e.getMessage());
-        }
-
-        return "redirect:/products/index";
-    }
-
-    @GetMapping("/delete")
-    public String deleteProduct(@RequestParam("id") int id) {
-        try {
-            Product product = productsRepository.findById(id).get();
-            String image = product.getImage();
-            if (image != null && !image.isEmpty()) {
-                String uploadDir = "public/images/";
-                Path uploadPath = Paths.get(uploadDir);
-                Path filePath = uploadPath.resolve(image);
-                Files.delete(filePath);
-            }
-            productsRepository.deleteById(id);
-        } catch (Exception e) {
-            System.out.println("Error deleting product: " + e.getMessage());
-        }
-
-        return "redirect:/products/index";
-    }
+    // model.addAttribute("message", "Product added to cart successfully");
+    // return "redirect:/products";
+    // }
 
 }

@@ -82,6 +82,11 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.smattme</groupId>
+			<artifactId>mysql-backup4j</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

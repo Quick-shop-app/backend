@@ -13,27 +13,27 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            return http
-                            .authorizeHttpRequests(auth -> auth
-                                            .requestMatchers("/").permitAll()
-                                            .requestMatchers("/products/**").permitAll()
-                                            .requestMatchers("/register").permitAll()
-                                            .requestMatchers("/login").permitAll()
-                                            .requestMatchers("/logout").permitAll()
-                                            .anyRequest().authenticated())
-                    .formLogin(form -> form
-                            .loginPage("/login")
-                            .permitAll()
-                            .usernameParameter("email")
-                            .passwordParameter("password")
-                            .defaultSuccessUrl("/", true))
-
-                            .logout(logout -> logout.logoutSuccessUrl("/")).build();
+        return http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/logout").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .successHandler(new CustomAuthSuccessHandler()))
+                .logout(logout -> logout.logoutSuccessUrl("/")).build();
     }
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
 }
