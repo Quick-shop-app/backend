@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
+import ugr.dss.quick_shop.models.EditProductDto;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.ProductDto;
 import ugr.dss.quick_shop.services.ProductsRepository;
@@ -97,10 +98,12 @@ public class AdminController {
     @GetMapping("/products/edit")
     public String editProductPage(Model model, @RequestParam("id") Long id) {
         try {
-            Product product = productsRepository.findById(id).get();
+            Product product = productsRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
             model.addAttribute("product", product);
 
-            ProductDto productDto = new ProductDto();
+            EditProductDto productDto = new EditProductDto();
+            productDto.setId(product.getId());
             productDto.setName(product.getName());
             productDto.setBrand(product.getBrand());
             productDto.setCategory(product.getCategory());
@@ -110,6 +113,7 @@ public class AdminController {
             model.addAttribute("productDto", productDto);
         } catch (Exception e) {
             System.out.println("Error getting product: " + e.getMessage());
+            return "redirect:/admin";
         }
         return "manage-products/edit";
     }
@@ -123,7 +127,7 @@ public class AdminController {
             model.addAttribute("product", product);
 
             if (bindingResult.hasErrors()) {
-                return "products/edit";
+                return "admin/products/edit";
             }
 
             if (!productDto.getImageFile().isEmpty() && productDto.getImageFile() != null) {
@@ -166,10 +170,10 @@ public class AdminController {
             System.out.println("Error updating product: " + e.getMessage());
         }
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/product/delete")
+    @GetMapping("/products/delete")
     public String deleteProduct(@RequestParam("id") Long id) {
         try {
             Product product = productsRepository.findById(id).get();
@@ -185,10 +189,10 @@ public class AdminController {
             System.out.println("Error deleting product: " + e.getMessage());
         }
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/product/download-db-sql")
+    @GetMapping("/products/download-db-sql")
     public String downloadDatabase() {
         // Implement database download logic here
         return "redirect:/admin";
