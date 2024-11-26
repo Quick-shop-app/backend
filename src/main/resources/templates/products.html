@@ -74,8 +74,14 @@
                                 <strong>Price:</strong> <span th:text="${product.price + ' €'}">100.00 €</span>
                             </p>
                             <div class="mt-auto">
-                                <a th:href="@{/cart/add(id=${product.id})}" class="btn btn-primary w-100">Add to
-                                    Cart</a>
+                                <form th:action="@{/cart/add}" method="post">
+                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <!-- Default quantity is set here -->
+                                    <button type="submit" class="btn btn-primary w-100 toggle-cart">Add to Cart</button>
+
+                                </form>
+
                             </div>
                         </div>
                     </div>
@@ -88,6 +94,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+
 </body>
 
 </html>

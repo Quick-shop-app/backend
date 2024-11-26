@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import ugr.dss.quick_shop.AppUser;
+import ugr.dss.quick_shop.models.AppUser;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @Component
@@ -23,7 +23,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         if (userRepository.findByEmail("admin@admin.com") == null) {
             AppUser admin = new AppUser();
             admin.setEmail("admin@admin.com");
-            admin.setPassword(passwordEncoder.encode("admin123")); 
+            admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setFirstName("Admin");
             admin.setRole("ADMIN");
             userRepository.save(admin);

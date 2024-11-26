@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.AppUser;
+import ugr.dss.quick_shop.models.AppUser;
 import ugr.dss.quick_shop.models.LoginDto;
 import ugr.dss.quick_shop.models.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
@@ -86,7 +86,7 @@ public class AccountController {
     @PostMapping("/login")
     public String loginUser(@Valid @ModelAttribute("loginDto") LoginDto loginDto, BindingResult result, Model model) {
         System.out.println("🚀 ~ " + loginDto);
-        
+
         // Check for validation errors
         if (result.hasErrors()) {
             return "login";

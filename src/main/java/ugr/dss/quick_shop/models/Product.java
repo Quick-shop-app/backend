@@ -12,10 +12,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "products")
 public class Product {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
     private String brand;
@@ -28,12 +28,11 @@ public class Product {
     private Date updatedAt;
     private String image;
 
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -100,4 +99,15 @@ public class Product {
     public void setImage(String image) {
         this.image = image;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", image='" + image + '\'' +
+                ", price=" + price +
+                '}';
+    }
+
 }
