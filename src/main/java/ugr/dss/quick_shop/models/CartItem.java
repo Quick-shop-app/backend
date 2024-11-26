@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 
 @Entity
 public class CartItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -20,19 +21,8 @@ public class CartItem {
 
     private Double totalPrice;
 
-    // Constructors
-    public CartItem() {
-    }
-
-    public CartItem(Cart cart, Product product, Integer quantity, Double totalPrice) {
-        this.cart = cart;
-        this.product = product;
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
-    }
-
     // Getters and Setters
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -67,4 +57,15 @@ public class CartItem {
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "id=" + id +
+                ", product=" + (product != null ? product : "null") +
+                ", quantity=" + quantity +
+                ", totalPrice=" + totalPrice +
+                '}';
+    }
+
 }
