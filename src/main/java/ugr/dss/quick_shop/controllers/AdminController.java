@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import ugr.dss.quick_shop.models.EditProductDto;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.ProductDto;
+import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller
@@ -35,6 +37,9 @@ public class AdminController {
 
     @Autowired
     private ProductsRepository productsRepository;
+
+    @Autowired
+    private DatabaseExportService databaseExportService;
 
     // @GetMapping({"", "/", "/dashboard"})
     // public String adminDashboard(Model model) {
@@ -192,9 +197,21 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/products/download-db-sql")
-    public String downloadDatabase() {
-        // Implement database download logic here
-        return "redirect:/admin";
+    @GetMapping("/products/download-db")
+    public void downloadDatabase(HttpServletResponse response) {
+        try {
+            // Generate the SQL script
+            byte[] sqlScript = databaseExportService.exportDatabaseToSql();
+
+            // Set response headers
+            response.setContentType("application/sql");
+            response.setHeader("Content-Disposition", "attachment; filename=products.sql");
+
+            // Write the SQL script to the response
+            response.getOutputStream().write(sqlScript);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
