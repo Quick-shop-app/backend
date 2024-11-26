@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductDto {
     @NotEmpty(message = "Name is required")
     private String name;
-    
+
     @NotEmpty(message = "Brand is required")
     private String brand;
 
@@ -56,7 +56,7 @@ public class ProductDto {
     }
 
     public void setPrice(double price) {
-        this.price = price; 
+        this.price = price;
     }
 
     public String getDescription() {

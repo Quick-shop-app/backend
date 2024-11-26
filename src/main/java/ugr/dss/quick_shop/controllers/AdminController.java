@@ -47,18 +47,18 @@ public class AdminController {
         return "manage-products/index";
     }
 
-    @GetMapping("/create")
+    @GetMapping("/products/create")
     public String createProductPage(Model model) {
         ProductDto productDto = new ProductDto();
         model.addAttribute("productDto", productDto);
 
-        return "products/create";
+        return "manage-products/create";
     }
 
-    @PostMapping("/create")
+    @PostMapping("/products/create")
     public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "products/create";
+            return "manage-products/create";
         }
 
         MultipartFile imageFile = productDto.getImageFile();
@@ -91,11 +91,11 @@ public class AdminController {
 
         productsRepository.save(product);
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/edit")
-    public String editProductPage(Model model, @RequestParam("id") int id) {
+    @GetMapping("/products/edit")
+    public String editProductPage(Model model, @RequestParam("id") Long id) {
         try {
             Product product = productsRepository.findById(id).get();
             model.addAttribute("product", product);
@@ -111,12 +111,12 @@ public class AdminController {
         } catch (Exception e) {
             System.out.println("Error getting product: " + e.getMessage());
         }
-        return "products/edit";
+        return "manage-products/edit";
     }
 
-    @PostMapping("/edit")
+    @PostMapping("/products/edit")
     public String editProduct(Model model, @Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult,
-            @RequestParam("id") int id) {
+            @RequestParam("id") Long id) {
         try {
             Date updatedAt = new Date();
             Product product = productsRepository.findById(id).get();
@@ -169,8 +169,8 @@ public class AdminController {
         return "redirect:/products/index";
     }
 
-    @GetMapping("/delete")
-    public String deleteProduct(@RequestParam("id") int id) {
+    @GetMapping("/product/delete")
+    public String deleteProduct(@RequestParam("id") Long id) {
         try {
             Product product = productsRepository.findById(id).get();
             String image = product.getImage();
@@ -188,7 +188,7 @@ public class AdminController {
         return "redirect:/products/index";
     }
 
-    @GetMapping("/download-db-sql")
+    @GetMapping("/product/download-db-sql")
     public String downloadDatabase() {
         // Implement database download logic here
         return "redirect:/admin";
