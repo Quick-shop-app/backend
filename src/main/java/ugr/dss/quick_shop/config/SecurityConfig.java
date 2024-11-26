@@ -14,10 +14,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/products/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/cart").authenticated()
+                        .requestMatchers("/products/**").permitAll()
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/logout").permitAll()
