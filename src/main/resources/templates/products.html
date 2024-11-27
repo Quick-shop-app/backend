@@ -29,6 +29,11 @@
                             <a class="nav-link" href="/register">Register</a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav" sec:authorize="hasRole('USER')">
+                        <li class="nav-item">
+                            Welcome, <span sec:authentication="principal.username"></span>
+                        </li>
+                    </ul>
                     <form sec:authorize="hasRole('USER')" th:action="@{/logout}" method="post">
                         <input type="hidden" th:value="${_csrf.token}" th:name="${_csrf.parameterName}">
                         <button type="submit" class="btn btn-link">Logout</button>

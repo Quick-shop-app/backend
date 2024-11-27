@@ -21,6 +21,11 @@ public class AccountController {
     @Autowired
     private AppUserRepository appUserRepository;
 
+    @GetMapping("/")
+    public String showHomePage(Model model) {
+        return "redirect:/products";
+    }
+
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
         RegisterDto registerDto = new RegisterDto();

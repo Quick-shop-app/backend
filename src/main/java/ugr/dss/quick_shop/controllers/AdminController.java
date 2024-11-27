@@ -50,7 +50,7 @@ public class AdminController {
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("products", products);
-        return "manage-products/index";
+        return "admin/index";
     }
 
     @GetMapping("/products/create")
@@ -58,13 +58,13 @@ public class AdminController {
         ProductDto productDto = new ProductDto();
         model.addAttribute("productDto", productDto);
 
-        return "manage-products/create";
+        return "admin/product/create";
     }
 
     @PostMapping("/products/create")
     public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "manage-products/create";
+            return "admin/product/create";
         }
 
         MultipartFile imageFile = productDto.getImageFile();
@@ -120,7 +120,7 @@ public class AdminController {
             System.out.println("Error getting product: " + e.getMessage());
             return "redirect:/admin";
         }
-        return "manage-products/edit";
+        return "admin/product/edit";
     }
 
     @PostMapping("/products/edit")
