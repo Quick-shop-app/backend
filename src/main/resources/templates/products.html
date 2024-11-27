@@ -31,7 +31,8 @@
                     </ul>
                     <ul class="navbar-nav" sec:authorize="hasRole('USER')">
                         <li class="nav-item">
-                            Welcome, <span sec:authentication="principal.username"></span>
+                            <a class="nav-link" href="#" style="cursor: default;">Welcome, <span
+                                    sec:authentication="principal.username"></span></a>
                         </li>
                     </ul>
                     <form sec:authorize="hasRole('USER')" th:action="@{/logout}" method="post">
