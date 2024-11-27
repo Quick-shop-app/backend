@@ -33,3 +33,4 @@ build/
 .vscode/
 
 /public/images
+!/public/images/placeholder.jpg
