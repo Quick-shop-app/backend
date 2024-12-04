@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import ugr.dss.quick_shop.models.EditProductDto;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.ProductDto;
+import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller
@@ -36,6 +38,9 @@ public class AdminController {
     @Autowired
     private ProductsRepository productsRepository;
 
+    @Autowired
+    private DatabaseExportService databaseExportService;
+
     // @GetMapping({"", "/", "/dashboard"})
     // public String adminDashboard(Model model) {
     // model.addAttribute("products", productsRepository.findAll());
@@ -45,7 +50,7 @@ public class AdminController {
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("products", products);
-        return "manage-products/index";
+        return "admin/index";
     }
 
     @GetMapping("/products/create")
@@ -53,13 +58,13 @@ public class AdminController {
         ProductDto productDto = new ProductDto();
         model.addAttribute("productDto", productDto);
 
-        return "manage-products/create";
+        return "admin/product/create";
     }
 
     @PostMapping("/products/create")
     public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "manage-products/create";
+            return "admin/product/create";
         }
 
         MultipartFile imageFile = productDto.getImageFile();
@@ -115,7 +120,7 @@ public class AdminController {
             System.out.println("Error getting product: " + e.getMessage());
             return "redirect:/admin";
         }
-        return "manage-products/edit";
+        return "admin/product/edit";
     }
 
     @PostMapping("/products/edit")
@@ -192,9 +197,21 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/products/download-db-sql")
-    public String downloadDatabase() {
-        // Implement database download logic here
-        return "redirect:/admin";
+    @GetMapping("/products/download-db")
+    public void downloadDatabase(HttpServletResponse response) {
+        try {
+            // Generate the SQL script
+            byte[] sqlScript = databaseExportService.exportDatabaseToSql();
+
+            // Set response headers
+            response.setContentType("application/sql");
+            response.setHeader("Content-Disposition", "attachment; filename=products.sql");
+
+            // Write the SQL script to the response
+            response.getOutputStream().write(sqlScript);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
