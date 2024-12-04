@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,16 +14,19 @@ import jakarta.validation.Valid;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.services.ProductsRepository;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.validation.BindingResult;
 import org.springframework.ui.Model;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import ugr.dss.quick_shop.models.AppUser;
+import ugr.dss.quick_shop.models.LoginDto;
 import ugr.dss.quick_shop.models.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class ApiController {
 
@@ -81,6 +85,51 @@ public class ApiController {
             result.addError(new FieldError("registerDto", "email", "An error occurred while processing your request"));
             return "register";
         }
+    }
+
+    @PostMapping("/login")
+    public HashMap<String, Object> login(@RequestBody @Valid LoginDto loginDto, BindingResult result) {
+        System.out.println("🚀 ~ " + loginDto);
+        HashMap<String, Object> response = new HashMap<>();
+
+        // Check for validation errors
+        if (result.hasErrors()) {
+            response.put("error", "Wrong email or password");
+            return response;
+        }
+
+        // Check if user exists
+        AppUser user = appUserRepository.findByEmail(loginDto.getEmail());
+        System.out.println(user);
+
+        if (user == null) {
+            result.addError(new FieldError("loginDto", "email", "Wrong email or password"));
+            // model.addAttribute("error", "Wrong email or password");
+            response.put("error", "Wrong email or password");
+            return response;
+        }
+
+        // Check if password is correct
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            result.addError(new FieldError("loginDto", "email", "Wrong email or password"));
+            // model.addAttribute("error", "Wrong email or password");
+            response.put("error", "Wrong email or password");
+            return response;
+        }
+
+        System.out.println("User logged in");
+
+        try {
+            response.put("success", true);
+
+            return response;
+        } catch (Exception e) {
+            result.addError(new FieldError("loginDto", "email", "An error occurred while processing your request"));
+            response.put("error", "An error occurred while processing your request");
+            return response;
+        }
+
     }
 
 }
