@@ -22,9 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import ugr.dss.quick_shop.models.EditProductDto;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.ProductDto;
+import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller
@@ -35,6 +38,9 @@ public class AdminController {
     @Autowired
     private ProductsRepository productsRepository;
 
+    @Autowired
+    private DatabaseExportService databaseExportService;
+
     // @GetMapping({"", "/", "/dashboard"})
     // public String adminDashboard(Model model) {
     // model.addAttribute("products", productsRepository.findAll());
@@ -44,21 +50,21 @@ public class AdminController {
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
         model.addAttribute("products", products);
-        return "manage-products/index";
+        return "admin/index";
     }
 
-    @GetMapping("/create")
+    @GetMapping("/products/create")
     public String createProductPage(Model model) {
         ProductDto productDto = new ProductDto();
         model.addAttribute("productDto", productDto);
 
-        return "products/create";
+        return "admin/product/create";
     }
 
-    @PostMapping("/create")
+    @PostMapping("/products/create")
     public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "products/create";
+            return "admin/product/create";
         }
 
         MultipartFile imageFile = productDto.getImageFile();
@@ -91,16 +97,18 @@ public class AdminController {
 
         productsRepository.save(product);
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/edit")
-    public String editProductPage(Model model, @RequestParam("id") int id) {
+    @GetMapping("/products/edit")
+    public String editProductPage(Model model, @RequestParam("id") Long id) {
         try {
-            Product product = productsRepository.findById(id).get();
+            Product product = productsRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
             model.addAttribute("product", product);
 
-            ProductDto productDto = new ProductDto();
+            EditProductDto productDto = new EditProductDto();
+            productDto.setId(product.getId());
             productDto.setName(product.getName());
             productDto.setBrand(product.getBrand());
             productDto.setCategory(product.getCategory());
@@ -110,20 +118,21 @@ public class AdminController {
             model.addAttribute("productDto", productDto);
         } catch (Exception e) {
             System.out.println("Error getting product: " + e.getMessage());
+            return "redirect:/admin";
         }
-        return "products/edit";
+        return "admin/product/edit";
     }
 
-    @PostMapping("/edit")
+    @PostMapping("/products/edit")
     public String editProduct(Model model, @Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult,
-            @RequestParam("id") int id) {
+            @RequestParam("id") Long id) {
         try {
             Date updatedAt = new Date();
             Product product = productsRepository.findById(id).get();
             model.addAttribute("product", product);
 
             if (bindingResult.hasErrors()) {
-                return "products/edit";
+                return "admin/products/edit";
             }
 
             if (!productDto.getImageFile().isEmpty() && productDto.getImageFile() != null) {
@@ -166,11 +175,11 @@ public class AdminController {
             System.out.println("Error updating product: " + e.getMessage());
         }
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/delete")
-    public String deleteProduct(@RequestParam("id") int id) {
+    @GetMapping("/products/delete")
+    public String deleteProduct(@RequestParam("id") Long id) {
         try {
             Product product = productsRepository.findById(id).get();
             String image = product.getImage();
@@ -185,12 +194,24 @@ public class AdminController {
             System.out.println("Error deleting product: " + e.getMessage());
         }
 
-        return "redirect:/products/index";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/download-db-sql")
-    public String downloadDatabase() {
-        // Implement database download logic here
-        return "redirect:/admin";
+    @GetMapping("/products/download-db")
+    public void downloadDatabase(HttpServletResponse response) {
+        try {
+            // Generate the SQL script
+            byte[] sqlScript = databaseExportService.exportDatabaseToSql();
+
+            // Set response headers
+            response.setContentType("application/sql");
+            response.setHeader("Content-Disposition", "attachment; filename=products.sql");
+
+            // Write the SQL script to the response
+            response.getOutputStream().write(sqlScript);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
