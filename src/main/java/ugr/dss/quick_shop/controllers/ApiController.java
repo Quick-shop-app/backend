@@ -46,21 +46,29 @@ public class ApiController {
     private AppUserRepository appUserRepository;
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("registerDto") RegisterDto registerDto, BindingResult result,
+    public HashMap<String, Object> registerUser(@Valid @RequestBody RegisterDto registerDto, BindingResult result,
             Model model) {
+
+        HashMap<String, Object> response = new HashMap<>();
+
         if (result.hasErrors()) {
-            return "register";
+            System.out.println(result);
+            response.put("error", "An error occurred while processing your request");
+            result.getAllErrors().forEach(error -> {
+                response.put(error.getCode(), error.getDefaultMessage());
+            });
+            return response;
         }
 
         AppUser existingUser = appUserRepository.findByEmail(registerDto.getEmail());
         if (existingUser != null) {
-            result.addError(new FieldError("registerDto", "email", "Email already in use"));
-            return "register";
+            response.put("error", "Email already in use");
+            return response;
         }
 
         if (!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
-            result.addError(new FieldError("registerDto", "confirmPassword", "Passwords do not match"));
-            return "register";
+            response.put("error", "Passwords do not match");
+            return response;
         }
 
         try {
@@ -80,10 +88,14 @@ public class ApiController {
             model.addAttribute("registerDto", new RegisterDto());
             model.addAttribute("success", true);
 
-            return "redirect:/login";
+            // return "redirect:/login";
+            response.put("success", true);
+            response.put("message", "User registered successfully");
+            return response;
         } catch (Exception e) {
-            result.addError(new FieldError("registerDto", "email", "An error occurred while processing your request"));
-            return "register";
+            response.put("error", "An error occurred while processing your request");
+            response.put("message", e.getMessage());
+            return response;
         }
     }
 
