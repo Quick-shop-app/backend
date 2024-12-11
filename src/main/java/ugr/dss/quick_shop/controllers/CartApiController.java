@@ -1,6 +1,5 @@
 package ugr.dss.quick_shop.controllers;
 
-import java.security.Principal;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
