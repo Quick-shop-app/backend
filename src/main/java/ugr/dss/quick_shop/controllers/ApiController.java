@@ -5,25 +5,24 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.Product;
-import ugr.dss.quick_shop.services.ProductsRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.validation.BindingResult;
-import org.springframework.ui.Model;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import ugr.dss.quick_shop.models.AppUser;
 import ugr.dss.quick_shop.models.LoginDto;
+import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import ugr.dss.quick_shop.services.ProductsRepository;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -134,7 +133,9 @@ public class ApiController {
 
         try {
             response.put("success", true);
-
+            // add user details to response without password
+            user.setPassword(null);
+            response.put("data", user);
             return response;
         } catch (Exception e) {
             result.addError(new FieldError("loginDto", "email", "An error occurred while processing your request"));
