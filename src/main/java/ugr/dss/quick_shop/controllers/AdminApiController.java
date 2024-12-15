@@ -31,9 +31,9 @@ import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminController {
+public class AdminApiController {
 
     @Autowired
     private ProductsRepository productsRepository;
