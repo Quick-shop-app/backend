@@ -10,6 +10,9 @@ phases:
 
   pre_build:
     commands:
+      - echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+      - echo AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
+      - if [ -z "$AWS_ACCOUNT_ID" ]; then echo "ERROR: AWS_ACCOUNT_ID is not set" && exit 1; fi
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPOSITORY
