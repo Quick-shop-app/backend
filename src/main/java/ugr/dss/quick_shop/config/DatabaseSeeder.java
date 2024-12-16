@@ -17,6 +17,9 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Seed the database with an admin user on startup
+     */
     @Override
     public void run(String... args) {
         // Create an admin user if it doesn't exist

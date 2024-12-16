@@ -21,11 +21,23 @@ public class AccountController {
     @Autowired
     private AppUserRepository appUserRepository;
 
+    /**
+     * Show the home page.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("/")
     public String showHomePage(Model model) {
         return "redirect:/products";
     }
 
+    /**
+     * Show the register page.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
         RegisterDto registerDto = new RegisterDto();
@@ -34,6 +46,14 @@ public class AccountController {
         return "register";
     }
 
+    /**
+     * Register a new user
+     * 
+     * @param registerDto
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("registerDto") RegisterDto registerDto, BindingResult result,
             Model model) {
@@ -80,6 +100,12 @@ public class AccountController {
         }
     }
 
+    /**
+     * Show the login page.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("/login")
     public String showLoginPage(Model model) {
         LoginDto loginDto = new LoginDto();
@@ -88,6 +114,14 @@ public class AccountController {
         return "login";
     }
 
+    /**
+     * Login user
+     * 
+     * @param loginDto
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping("/login")
     public String loginUser(@Valid @ModelAttribute("loginDto") LoginDto loginDto, BindingResult result, Model model) {
         System.out.println("🚀 ~ " + loginDto);

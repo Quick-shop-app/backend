@@ -19,6 +19,12 @@ public class ProductsController {
     @Autowired
     private ProductsRepository productsRepository;
 
+    /**
+     * Show the products page.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping({ "", "/", "/index" })
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));

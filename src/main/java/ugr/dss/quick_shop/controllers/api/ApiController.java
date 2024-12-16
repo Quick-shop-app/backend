@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +21,11 @@ public class ApiController {
     @Autowired
     private ProductsRepository productsRepository;
 
+    /**
+     * Get all products
+     * 
+     * @return
+     */
     @GetMapping("/products")
     public HashMap<String, Object> products() {
         HashMap<String, Object> response = new HashMap<>();

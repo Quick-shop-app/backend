@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
 import java.util.HashMap;
 
@@ -23,6 +23,9 @@ public class CartApiController {
 
     /**
      * Get cart items for the authenticated user.
+     * 
+     * @param username
+     * @return
      */
     @GetMapping
     public HashMap<String, Object> getCart(@RequestParam String username) {
@@ -37,13 +40,18 @@ public class CartApiController {
             response.put("error", "Cart not found");
             return response;
         }
-        response.put("cartItems", cart.getItems().toArray());
-        response.put("totalItems", cart.getItems().size());
+        response.put("data", cart.getItems().toArray());
+        response.put("count", cart.getItems().size());
         return response;
     }
 
     /**
      * Add an item to the cart.
+     * 
+     * @param username
+     * @param productId
+     * @param quantity
+     * @return
      */
     @PostMapping("/add")
     public HashMap<String, Object> addToCart(@RequestParam String username, @RequestParam Long productId,
@@ -67,6 +75,10 @@ public class CartApiController {
 
     /**
      * Remove an item from the cart.
+     * 
+     * @param username
+     * @param productId
+     * @return
      */
     @PostMapping("/remove")
     public HashMap<String, Object> removeFromCart(@RequestParam String username,
@@ -85,6 +97,9 @@ public class CartApiController {
 
     /**
      * Clear the cart.
+     * 
+     * @param username
+     * @return
      */
     @PostMapping("/clear")
     public HashMap<String, Object> clearCart(@RequestParam String username) {
