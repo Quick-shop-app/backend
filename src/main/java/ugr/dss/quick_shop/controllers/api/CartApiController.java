@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
 import java.util.HashMap;
 
@@ -37,8 +37,8 @@ public class CartApiController {
             response.put("error", "Cart not found");
             return response;
         }
-        response.put("cartItems", cart.getItems().toArray());
-        response.put("totalItems", cart.getItems().size());
+        response.put("data", cart.getItems().toArray());
+        response.put("count", cart.getItems().size());
         return response;
     }
 

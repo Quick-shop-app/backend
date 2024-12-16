@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
 import java.util.HashMap;
 import java.util.List;

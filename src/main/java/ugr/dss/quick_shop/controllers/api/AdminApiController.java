@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
 import java.io.IOException;
 import java.io.InputStream;
