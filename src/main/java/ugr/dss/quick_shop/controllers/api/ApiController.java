@@ -1,35 +1,38 @@
-package ugr.dss.quick_shop.controllers;
+package ugr.dss.quick_shop.controllers.api;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
-@Controller
-@RequestMapping({ "/products" })
-public class ProductsController {
+@RestController
+@CrossOrigin(origins = "*")
+@RequestMapping("/api")
+public class ApiController {
 
     @Autowired
     private ProductsRepository productsRepository;
 
     /**
-     * Show the products page.
+     * Get all products
      * 
-     * @param model
      * @return
      */
-    @GetMapping({ "", "/", "/index" })
-    public String showProductsPage(Model model) {
+    @GetMapping("/products")
+    public HashMap<String, Object> products() {
+        HashMap<String, Object> response = new HashMap<>();
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-        model.addAttribute("products", products);
-        return "products";
+        response.put("count", products.size());
+        response.put("data", products);
+        return response;
     }
 
 }

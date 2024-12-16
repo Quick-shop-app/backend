@@ -7,10 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import ugr.dss.quick_shop.models.AppUser;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
-import ugr.dss.quick_shop.AppUser;
-
-
 
 @Service
 public class AppUserService implements UserDetailsService {
@@ -26,11 +24,11 @@ public class AppUserService implements UserDetailsService {
         }
 
         UserDetails springUser = User.withUsername(appUser.getEmail())
-            .password(appUser.getPassword())
-            .roles(appUser.getRole())
+                .password(appUser.getPassword())
+                .roles(appUser.getRole())
                 .build();
-            
+
         return springUser;
     }
-    
+
 }
