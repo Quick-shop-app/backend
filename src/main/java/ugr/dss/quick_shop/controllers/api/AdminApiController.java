@@ -2,24 +2,16 @@ package ugr.dss.quick_shop.controllers.api;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Date;
-import java.util.List;
+import java.nio.file.*;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,9 +22,10 @@ import ugr.dss.quick_shop.models.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
-@Controller
+@RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@CrossOrigin(origins = "*")
 public class AdminApiController {
 
     @Autowired
@@ -41,49 +34,42 @@ public class AdminApiController {
     @Autowired
     private DatabaseExportService databaseExportService;
 
-    // @GetMapping({"", "/", "/dashboard"})
-    // public String adminDashboard(Model model) {
-    // model.addAttribute("products", productsRepository.findAll());
-    // return "admin";
-    // }
-    @GetMapping({ "", "/", "/index" })
-    public String showProductsPage(Model model) {
-        List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-        model.addAttribute("products", products);
-        return "admin/index";
-    }
+    @PostMapping(value = "/products", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> createProduct(
+            @Valid @RequestPart("product") ProductDto productDto,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            BindingResult bindingResult) {
 
-    @GetMapping("/products/create")
-    public String createProductPage(Model model) {
-        ProductDto productDto = new ProductDto();
-        model.addAttribute("productDto", productDto);
+        Map<String, Object> response = new HashMap<>();
 
-        return "admin/product/create";
-    }
-
-    @PostMapping("/products/create")
-    public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "admin/product/create";
+            response.put("error", "Validation failed");
+            bindingResult.getAllErrors().forEach(error -> {
+                response.put(error.getCode(), error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body(response);
         }
 
-        MultipartFile imageFile = productDto.getImageFile();
+        String fileName = null;
         Date createdDate = new Date();
-        String fileName = createdDate.getTime() + "_product_" + imageFile.getOriginalFilename();
-        try {
+
+        // Handle image if provided
+        if (imageFile != null && !imageFile.isEmpty()) {
+            fileName = createdDate.getTime() + "_product_" + imageFile.getOriginalFilename();
             String uploadDir = "public/images/";
             Path uploadPath = Paths.get(uploadDir);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+            try {
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                try (InputStream inputStream = imageFile.getInputStream()) {
+                    Path filePath = uploadPath.resolve(fileName);
+                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+                response.put("error", "Error saving image file: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-
-            try (InputStream inputStream = imageFile.getInputStream()) {
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving image file: " + e.getMessage());
         }
 
         Product product = new Product();
@@ -94,120 +80,123 @@ public class AdminApiController {
         product.setDescription(productDto.getDescription());
         product.setImage(fileName);
         product.setCreatedAt(createdDate);
-
         productsRepository.save(product);
 
-        return "redirect:/admin";
+        response.put("success", true);
+        response.put("product", product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/products/edit")
-    public String editProductPage(Model model, @RequestParam("id") Long id) {
-        try {
-            Product product = productsRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            model.addAttribute("product", product);
-
-            EditProductDto productDto = new EditProductDto();
-            productDto.setId(product.getId());
-            productDto.setName(product.getName());
-            productDto.setBrand(product.getBrand());
-            productDto.setCategory(product.getCategory());
-            productDto.setPrice(product.getPrice());
-            productDto.setDescription(product.getDescription());
-
-            model.addAttribute("productDto", productDto);
-        } catch (Exception e) {
-            System.out.println("Error getting product: " + e.getMessage());
-            return "redirect:/admin";
+    @GetMapping("/products/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long id) {
+        Optional<Product> productOpt = productsRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Product not found"));
         }
-        return "admin/product/edit";
+        return ResponseEntity.ok(productOpt.get());
     }
 
-    @PostMapping("/products/edit")
-    public String editProduct(Model model, @Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult,
-            @RequestParam("id") Long id) {
-        try {
-            Date updatedAt = new Date();
-            Product product = productsRepository.findById(id).get();
-            model.addAttribute("product", product);
+    @PutMapping(value = "/products/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> editProduct(
+            @PathVariable("id") Long id,
+            @Valid @RequestPart("product") ProductDto productDto,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            BindingResult bindingResult) {
 
-            if (bindingResult.hasErrors()) {
-                return "admin/products/edit";
-            }
+        Map<String, Object> response = new HashMap<>();
 
-            if (!productDto.getImageFile().isEmpty() && productDto.getImageFile() != null) {
-                MultipartFile imageFile = productDto.getImageFile();
-                String fileName = updatedAt.getTime() + "_product_" + imageFile.getOriginalFilename();
-                try {
-                    String uploadDir = "public/images/";
-                    Path uploadPath = Paths.get(uploadDir);
+        if (bindingResult.hasErrors()) {
+            response.put("error", "Validation failed");
+            bindingResult.getAllErrors().forEach(error -> {
+                response.put(error.getCode(), error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body(response);
+        }
 
-                    if (!Files.exists(uploadPath)) {
-                        Files.createDirectories(uploadPath);
-                    }
+        Optional<Product> productOpt = productsRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Product not found"));
+        }
 
-                    try (InputStream inputStream = imageFile.getInputStream()) {
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-                    }
+        Product product = productOpt.get();
+        Date updatedAt = new Date();
 
-                    String oldImage = product.getImage();
-                    if (oldImage != null && !oldImage.isEmpty()) {
-                        Path oldFilePath = uploadPath.resolve(oldImage);
+        // If a new image is provided, handle image replacement
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String fileName = updatedAt.getTime() + "_product_" + imageFile.getOriginalFilename();
+            String uploadDir = "public/images/";
+            Path uploadPath = Paths.get(uploadDir);
+
+            try {
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                try (InputStream inputStream = imageFile.getInputStream()) {
+                    Path filePath = uploadPath.resolve(fileName);
+                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                // Delete old image if exists
+                String oldImage = product.getImage();
+                if (oldImage != null && !oldImage.isEmpty()) {
+                    Path oldFilePath = uploadPath.resolve(oldImage);
+                    if (Files.exists(oldFilePath)) {
                         Files.delete(oldFilePath);
                     }
-                } catch (IOException e) {
-                    System.out.println("Error saving image file: " + e.getMessage());
                 }
                 product.setImage(fileName);
+            } catch (IOException e) {
+                response.put("error", "Error saving image file: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
-
-            product.setId(id);
-            product.setName(productDto.getName());
-            product.setBrand(productDto.getBrand());
-            product.setCategory(productDto.getCategory());
-            product.setPrice(productDto.getPrice());
-            product.setDescription(productDto.getDescription());
-            product.setUpdatedAt(updatedAt);
-
-            productsRepository.save(product);
-        } catch (Exception e) {
-            System.out.println("Error updating product: " + e.getMessage());
         }
 
-        return "redirect:/admin";
+        product.setName(productDto.getName());
+        product.setBrand(productDto.getBrand());
+        product.setCategory(productDto.getCategory());
+        product.setPrice(productDto.getPrice());
+        product.setDescription(productDto.getDescription());
+        product.setUpdatedAt(updatedAt);
+
+        productsRepository.save(product);
+        response.put("success", true);
+        response.put("product", product);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/products/delete")
-    public String deleteProduct(@RequestParam("id") Long id) {
-        try {
-            Product product = productsRepository.findById(id).get();
-            String image = product.getImage();
-            if (image != null && !image.isEmpty()) {
-                String uploadDir = "public/images/";
-                Path uploadPath = Paths.get(uploadDir);
-                Path filePath = uploadPath.resolve(image);
-                Files.delete(filePath);
-            }
-            productsRepository.deleteById(id);
-        } catch (Exception e) {
-            System.out.println("Error deleting product: " + e.getMessage());
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) {
+        Optional<Product> productOpt = productsRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Product not found"));
         }
 
-        return "redirect:/admin";
+        Product product = productOpt.get();
+        String image = product.getImage();
+        if (image != null && !image.isEmpty()) {
+            String uploadDir = "public/images/";
+            Path uploadPath = Paths.get(uploadDir);
+            Path filePath = uploadPath.resolve(image);
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.singletonMap("error", "Error deleting product image: " + e.getMessage()));
+            }
+        }
+        productsRepository.deleteById(id);
+        return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
     @GetMapping("/products/download-db")
     public void downloadDatabase(HttpServletResponse response) {
         try {
-            // Generate the SQL script
             byte[] sqlScript = databaseExportService.exportDatabaseToSql();
-
-            // Set response headers
             response.setContentType("application/sql");
             response.setHeader("Content-Disposition", "attachment; filename=products.sql");
-
-            // Write the SQL script to the response
             response.getOutputStream().write(sqlScript);
             response.getOutputStream().flush();
         } catch (IOException e) {
