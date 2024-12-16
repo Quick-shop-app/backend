@@ -2,21 +2,35 @@ package ugr.dss.quick_shop.controllers.api;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.EditProductDto;
 import ugr.dss.quick_shop.models.Product;
 import ugr.dss.quick_shop.models.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
@@ -34,6 +48,14 @@ public class AdminApiController {
     @Autowired
     private DatabaseExportService databaseExportService;
 
+    /**
+     * Create a new product.
+     * 
+     * @param productDto
+     * @param imageFile
+     * @param bindingResult
+     * @return
+     */
     @PostMapping(value = "/products", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> createProduct(
             @Valid @RequestPart("product") ProductDto productDto,
@@ -87,6 +109,11 @@ public class AdminApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Get all products.
+     * 
+     * @return
+     */
     @GetMapping("/products/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") Long id) {
         Optional<Product> productOpt = productsRepository.findById(id);
@@ -97,6 +124,15 @@ public class AdminApiController {
         return ResponseEntity.ok(productOpt.get());
     }
 
+    /**
+     * Edit a product.
+     * 
+     * @param id
+     * @param productDto
+     * @param imageFile
+     * @param bindingResult
+     * @return
+     */
     @PutMapping(value = "/products/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> editProduct(
             @PathVariable("id") Long id,
@@ -166,6 +202,12 @@ public class AdminApiController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Delete a product.
+     * 
+     * @param id
+     * @return
+     */
     @DeleteMapping("/products/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id) {
         Optional<Product> productOpt = productsRepository.findById(id);
@@ -191,6 +233,11 @@ public class AdminApiController {
         return ResponseEntity.ok(Collections.singletonMap("success", true));
     }
 
+    /**
+     * Download the database as an SQL script.
+     * 
+     * @param response
+     */
     @GetMapping("/products/download-db")
     public void downloadDatabase(HttpServletResponse response) {
         try {

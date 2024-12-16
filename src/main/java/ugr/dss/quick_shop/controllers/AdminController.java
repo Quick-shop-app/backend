@@ -41,11 +41,12 @@ public class AdminController {
     @Autowired
     private DatabaseExportService databaseExportService;
 
-    // @GetMapping({"", "/", "/dashboard"})
-    // public String adminDashboard(Model model) {
-    // model.addAttribute("products", productsRepository.findAll());
-    // return "admin";
-    // }
+    /**
+     * Show the admin dashboard.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping({ "", "/", "/index" })
     public String showProductsPage(Model model) {
         List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
@@ -53,6 +54,12 @@ public class AdminController {
         return "admin/index";
     }
 
+    /**
+     * Show the create product page.
+     * 
+     * @param model
+     * @return
+     */
     @GetMapping("/products/create")
     public String createProductPage(Model model) {
         ProductDto productDto = new ProductDto();
@@ -61,6 +68,13 @@ public class AdminController {
         return "admin/product/create";
     }
 
+    /**
+     * Create a new product.
+     * 
+     * @param productDto
+     * @param bindingResult
+     * @return
+     */
     @PostMapping("/products/create")
     public String createProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -100,6 +114,13 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    /**
+     * Show the edit product page.
+     * 
+     * @param model
+     * @param id
+     * @return
+     */
     @GetMapping("/products/edit")
     public String editProductPage(Model model, @RequestParam("id") Long id) {
         try {
@@ -123,6 +144,15 @@ public class AdminController {
         return "admin/product/edit";
     }
 
+    /**
+     * Edit a product.
+     * 
+     * @param model
+     * @param productDto
+     * @param bindingResult
+     * @param id            // Product ID
+     * @return
+     */
     @PostMapping("/products/edit")
     public String editProduct(Model model, @Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult,
             @RequestParam("id") Long id) {
@@ -178,6 +208,12 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    /**
+     * Delete a product.
+     * 
+     * @param id
+     * @return
+     */
     @GetMapping("/products/delete")
     public String deleteProduct(@RequestParam("id") Long id) {
         try {
@@ -197,6 +233,11 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    /**
+     * Download the database as an SQL script.
+     * 
+     * @param response
+     */
     @GetMapping("/products/download-db")
     public void downloadDatabase(HttpServletResponse response) {
         try {

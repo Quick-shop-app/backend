@@ -27,6 +27,14 @@ public class AccountApiController {
     @Autowired
     private AppUserRepository appUserRepository;
 
+    /**
+     * Register a new user
+     * 
+     * @param registerDto
+     * @param result
+     * @param model
+     * @return
+     */
     @PostMapping("/register")
     public HashMap<String, Object> registerUser(@Valid @RequestBody RegisterDto registerDto, BindingResult result,
             Model model) {
@@ -81,6 +89,13 @@ public class AccountApiController {
         }
     }
 
+    /**
+     * Login user
+     * 
+     * @param loginDto
+     * @param result
+     * @return
+     */
     @PostMapping("/login")
     public HashMap<String, Object> login(@RequestBody @Valid LoginDto loginDto, BindingResult result) {
         System.out.println("🚀 ~ " + loginDto);
