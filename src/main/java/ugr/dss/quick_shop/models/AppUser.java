@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop;
+package ugr.dss.quick_shop.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
