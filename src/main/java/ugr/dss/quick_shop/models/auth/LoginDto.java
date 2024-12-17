@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.models;
+package ugr.dss.quick_shop.models.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

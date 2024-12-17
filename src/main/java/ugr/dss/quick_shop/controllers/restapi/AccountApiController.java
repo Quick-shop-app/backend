@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers.api;
+package ugr.dss.quick_shop.controllers.restapi;
 
 import java.util.HashMap;
 
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.AppUser;
-import ugr.dss.quick_shop.models.LoginDto;
-import ugr.dss.quick_shop.models.RegisterDto;
+import ugr.dss.quick_shop.models.auth.AppUser;
+import ugr.dss.quick_shop.models.auth.LoginDto;
+import ugr.dss.quick_shop.models.auth.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @RestController
@@ -38,7 +38,6 @@ public class AccountApiController {
     @PostMapping("/register")
     public HashMap<String, Object> registerUser(@Valid @RequestBody RegisterDto registerDto, BindingResult result,
             Model model) {
-
         HashMap<String, Object> response = new HashMap<>();
 
         if (result.hasErrors()) {

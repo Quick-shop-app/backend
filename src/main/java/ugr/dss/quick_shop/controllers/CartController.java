@@ -4,7 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ugr.dss.quick_shop.models.Cart;
+
+import ugr.dss.quick_shop.models.cart.Cart;
 import ugr.dss.quick_shop.services.CartService;
 
 import java.security.Principal;

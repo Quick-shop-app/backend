@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers.api;
+package ugr.dss.quick_shop.controllers.restapi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.Product;
-import ugr.dss.quick_shop.models.ProductDto;
+import ugr.dss.quick_shop.models.product.Product;
+import ugr.dss.quick_shop.models.product.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
@@ -62,7 +62,7 @@ public class AdminApiController {
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
             BindingResult bindingResult) {
 
-        Map<String, Object> response = new HashMap<>();
+        HashMap<String, Object> response = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
             response.put("error", "Validation failed");

@@ -1,13 +1,13 @@
 package ugr.dss.quick_shop.services;
 
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import ugr.dss.quick_shop.models.AppUser;
+import ugr.dss.quick_shop.models.auth.AppUser;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @Service
