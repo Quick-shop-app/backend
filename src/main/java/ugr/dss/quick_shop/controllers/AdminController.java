@@ -24,9 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.EditProductDto;
-import ugr.dss.quick_shop.models.Product;
-import ugr.dss.quick_shop.models.ProductDto;
+import ugr.dss.quick_shop.models.product.EditProductDto;
+import ugr.dss.quick_shop.models.product.Product;
+import ugr.dss.quick_shop.models.product.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
 

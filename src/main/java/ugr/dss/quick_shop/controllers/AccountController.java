@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.AppUser;
-import ugr.dss.quick_shop.models.LoginDto;
-import ugr.dss.quick_shop.models.RegisterDto;
+import ugr.dss.quick_shop.models.auth.AppUser;
+import ugr.dss.quick_shop.models.auth.LoginDto;
+import ugr.dss.quick_shop.models.auth.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @Controller

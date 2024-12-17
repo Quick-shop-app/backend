@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ugr.dss.quick_shop.models.Product;
+import ugr.dss.quick_shop.models.product.Product;
 import ugr.dss.quick_shop.services.ProductsRepository;
 
 @Controller

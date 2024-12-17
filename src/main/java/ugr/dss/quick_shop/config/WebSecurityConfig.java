@@ -10,10 +10,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class WebSecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                return http
+                return http.securityMatcher("/**")
                                 .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/api/cart/**", "/api/admin/**",
                                                 "/api/auth/..")) // Disable CSRF for API
                                 .authorizeHttpRequests(auth -> auth
