@@ -1,6 +1,7 @@
-package ugr.dss.quick_shop.models;
+package ugr.dss.quick_shop.models.cart;
 
 import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 

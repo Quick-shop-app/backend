@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.models;
+package ugr.dss.quick_shop.models.product;
 
 import java.util.Date;
 

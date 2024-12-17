@@ -2,7 +2,8 @@ package ugr.dss.quick_shop.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ugr.dss.quick_shop.models.Product;
+
+import ugr.dss.quick_shop.models.product.Product;
 
 import java.util.List;
 

@@ -3,10 +3,10 @@ package ugr.dss.quick_shop.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ugr.dss.quick_shop.models.AppUser;
-import ugr.dss.quick_shop.models.Cart;
-import ugr.dss.quick_shop.models.CartItem;
-import ugr.dss.quick_shop.models.Product;
+import ugr.dss.quick_shop.models.auth.AppUser;
+import ugr.dss.quick_shop.models.cart.Cart;
+import ugr.dss.quick_shop.models.cart.CartItem;
+import ugr.dss.quick_shop.models.product.Product;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 import ugr.dss.quick_shop.repositories.CartRepository;
 
