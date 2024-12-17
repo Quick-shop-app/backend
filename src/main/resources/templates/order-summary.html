@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Order Summary</title>
+</head>
+
+<body>
+    <h1>Order Summary</h1>
+    <p>Order ID: <span th:text="${order.id}"></span></p>
+    <p>Username: <span th:text="${order.username}"></span></p>
+    <p>Total Price: <span th:text="${order.totalPrice}"></span></p>
+    <p>Order Date: <span th:text="${order.orderDate}"></span></p>
+    <a href="/">Back to Home</a>
+</body>
+
+</html>
