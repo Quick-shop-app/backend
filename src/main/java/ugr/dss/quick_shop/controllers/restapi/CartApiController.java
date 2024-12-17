@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ugr.dss.quick_shop.models.cart.Cart;
+import ugr.dss.quick_shop.models.order.Order;
 import ugr.dss.quick_shop.services.CartService;
+import ugr.dss.quick_shop.services.OrderService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -22,6 +24,9 @@ public class CartApiController {
 
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     /**
      * Get cart items for the authenticated user.
@@ -130,4 +135,34 @@ public class CartApiController {
         }
         return auth.getName();
     }
+
+    /**
+     * Finalize the cart and create an order.
+     * 
+     * @return
+     */
+    @PostMapping("/finalize")
+    public HashMap<String, Object> finalizeCart() {
+        String username = getAuthenticatedUsername();
+        HashMap<String, Object> response = new HashMap<>();
+
+        if (username == null) {
+            response.put("error", "User is not authenticated");
+            return response;
+        }
+
+        Cart cart = cartService.getCartForUser(username);
+        if (cart.getItems().isEmpty()) {
+            response.put("error", "Cart is empty");
+            return response;
+        }
+
+        Order order = orderService.createOrderFromCart(cart);
+        cartService.clearCart(username);
+        response.put("data", order);
+        response.put("success", true);
+        response.put("message", "Order created successfully");
+        return response;
+    }
+
 }

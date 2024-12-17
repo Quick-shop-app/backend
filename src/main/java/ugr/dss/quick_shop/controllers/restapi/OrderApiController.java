@@ -11,7 +11,7 @@ import ugr.dss.quick_shop.models.order.Order;
 import ugr.dss.quick_shop.services.OrderService;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderApiController {
 
     @Autowired

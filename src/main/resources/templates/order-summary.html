@@ -3,15 +3,131 @@
 
 <head>
     <title>Order Summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .summary-container {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 50px;
+        }
+
+        .summary-header {
+            font-weight: bold;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .summary-detail {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .summary-detail span {
+            font-weight: 600;
+            color: #222;
+        }
+
+        .items-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #444;
+            margin-top: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 1.1rem;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-row span {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .total-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            margin-top: 30px;
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Order Summary</h1>
-    <p>Order ID: <span th:text="${order.id}"></span></p>
-    <p>Username: <span th:text="${order.username}"></span></p>
-    <p>Total Price: <span th:text="${order.totalPrice}"></span></p>
-    <p>Order Date: <span th:text="${order.orderDate}"></span></p>
-    <a href="/">Back to Home</a>
+    <div class="container d-flex justify-content-center">
+        <!-- Order Summary Card -->
+        <div class="summary-container col-md-8">
+            <h2 class="text-center summary-header">Order Summary</h2>
+
+            <!-- Order Details -->
+            <div class="summary-detail"><strong>Order ID:</strong> <span th:text="${order.id}">123</span></div>
+            <div class="summary-detail"><strong>Username:</strong> <span
+                    th:text="${order.username}">john.doe@example.com</span></div>
+            <div class="summary-detail"><strong>Order Date:</strong>
+                <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}">2024-06-01</span>
+            </div>
+
+            <!-- Order Items -->
+            <div class="items-header">Order Items</div>
+            <div th:each="item : ${order.items}" class="item-row">
+                <div>
+                    <span th:text="${item.productName}">Product Name</span>
+                    - Quantity: <span th:text="${item.quantity}">1</span>
+                </div>
+                <div style="font-weight: bold; color: #dc3545;" th:text="${item.price + ' €'}">0.00 €</div>
+            </div>
+
+            <!-- Total Price -->
+            <div class="total-price">
+                Total Price: <span th:text="${order.totalPrice + ' €'}">100.00 €</span>
+            </div>
+
+            <!-- Back to Home Button -->
+            <div class="text-center">
+                <a href="/" class="btn btn-back">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
