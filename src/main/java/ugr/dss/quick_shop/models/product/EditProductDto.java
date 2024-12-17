@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.models;
+package ugr.dss.quick_shop.models.product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -7,7 +7,10 @@ import jakarta.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class ProductDto {
+public class EditProductDto {
+    @NotNull(message = "ID is required")
+    private Long id;
+
     @NotEmpty(message = "Name is required")
     private String name;
 
@@ -26,6 +29,14 @@ public class ProductDto {
 
     @NotNull(message = "Image is required")
     private MultipartFile imageFile;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

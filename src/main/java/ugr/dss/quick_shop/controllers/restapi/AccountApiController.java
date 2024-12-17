@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers.api;
+package ugr.dss.quick_shop.controllers.restapi;
 
 import java.util.HashMap;
 
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import ugr.dss.quick_shop.models.LoginDto;
-import ugr.dss.quick_shop.models.RegisterDto;
+import ugr.dss.quick_shop.models.auth.LoginDto;
+import ugr.dss.quick_shop.models.auth.RegisterDto;
 import ugr.dss.quick_shop.services.AppUserService;
 
 @RestController

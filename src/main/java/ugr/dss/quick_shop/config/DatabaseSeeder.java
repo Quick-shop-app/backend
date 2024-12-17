@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import ugr.dss.quick_shop.models.AppUser;
+import ugr.dss.quick_shop.models.auth.AppUser;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @Component

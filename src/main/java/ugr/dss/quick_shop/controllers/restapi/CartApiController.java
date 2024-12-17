@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.controllers.api;
+package ugr.dss.quick_shop.controllers.restapi;
 
 import java.util.HashMap;
 
@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ugr.dss.quick_shop.models.Cart;
+import ugr.dss.quick_shop.models.cart.Cart;
+import ugr.dss.quick_shop.models.order.Order;
 import ugr.dss.quick_shop.services.CartService;
+import ugr.dss.quick_shop.services.OrderService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -23,10 +25,12 @@ public class CartApiController {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private OrderService orderService;
+
     /**
      * Get cart items for the authenticated user.
      * 
-     * @param username
      * @return
      */
     @GetMapping
@@ -52,7 +56,6 @@ public class CartApiController {
     /**
      * Add an item to the cart.
      * 
-     * @param username
      * @param productId
      * @param quantity
      * @return
@@ -81,7 +84,6 @@ public class CartApiController {
     /**
      * Remove an item from the cart.
      * 
-     * @param username
      * @param productId
      * @return
      */
@@ -105,7 +107,6 @@ public class CartApiController {
     /**
      * Clear the cart.
      * 
-     * @param username
      * @return
      */
     @PostMapping("/clear")
@@ -134,4 +135,34 @@ public class CartApiController {
         }
         return auth.getName();
     }
+
+    /**
+     * Finalize the cart and create an order.
+     * 
+     * @return
+     */
+    @PostMapping("/finalize")
+    public HashMap<String, Object> finalizeCart() {
+        String username = getAuthenticatedUsername();
+        HashMap<String, Object> response = new HashMap<>();
+
+        if (username == null) {
+            response.put("error", "User is not authenticated");
+            return response;
+        }
+
+        Cart cart = cartService.getCartForUser(username);
+        if (cart.getItems().isEmpty()) {
+            response.put("error", "Cart is empty");
+            return response;
+        }
+
+        Order order = orderService.createOrderFromCart(cart);
+        cartService.clearCart(username);
+        response.put("data", order);
+        response.put("success", true);
+        response.put("message", "Order created successfully");
+        return response;
+    }
+
 }

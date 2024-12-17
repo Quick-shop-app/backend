@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import ugr.dss.quick_shop.models.AppUser;
-import ugr.dss.quick_shop.models.RegisterDto;
+import ugr.dss.quick_shop.models.auth.AppUser;
+import ugr.dss.quick_shop.models.auth.RegisterDto;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 
 @Service

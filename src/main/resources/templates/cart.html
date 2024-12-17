@@ -37,6 +37,15 @@
         .btn-continue:hover {
             background-color: #0056b3;
         }
+
+        .btn-checkout {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .btn-checkout:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 
@@ -70,6 +79,13 @@
                                         <strong>Price:</strong> <span th:text="${item.product.price + ' €'}">100.00
                                             €</span>
                                     </p>
+                                    <p class="mb-0">
+                                        <strong>Quantity:</strong> <span th:text="${item.quantity}">1</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Total:</strong>
+                                        <span th:text="${item.totalPrice + ' €'}">100.00 €</span>
+                                    </p>
                                 </div>
                             </div>
                             <!-- Remove Button -->
@@ -78,7 +94,6 @@
                                     <input type="hidden" name="productId" th:value="${item.product.id}">
                                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                                 </form>
-
                             </div>
                         </div>
                     </div>
@@ -87,11 +102,93 @@
 
             <!-- Cart Summary -->
             <div class="row mt-5">
-                <div class="col-md-8 text-start">
+                <div class="col-md-12 text-end">
+                    <h4 class="cart-summary mb-3">
+                        Total: <span th:text="${cartTotal + ' €'}">0.00 €</span>
+                    </h4>
                     <a href="/products" class="btn btn-continue btn-sm px-4 py-2">Continue Shopping</a>
+
+                    <!-- Finalize Order Form -->
+                    <form th:action="@{/cart/finalize}" method="post" class="d-inline-block ms-2">
+                        <button type="submit" class="btn btn-success btn-sm px-4 py-2">Finalize Cart</button>
+                    </form>
+
                 </div>
             </div>
+
+
+
         </div>
+
+        <!-- Order History -->
+        <div class="mt-5">
+            <h3 class="text-center mb-4" style="font-weight: bold; color: #333; font-size: 1.8rem;">Order History</h3>
+            <div th:if="${orderHistory == null or orderHistory.isEmpty()}" class="alert alert-light text-center"
+                style="font-size: 1.2rem; color: #666;">
+                You have no previous orders.
+            </div>
+
+            <div th:unless="${orderHistory.isEmpty()}" class="table-responsive shadow-sm p-3 mb-5 bg-white rounded"
+                style="border: 1px solid #ddd;">
+                <table class="table table-hover align-middle mb-0">
+                    <!-- Table Header -->
+                    <thead class="table-light">
+                        <tr>
+                            <th
+                                style="width: 10%; text-align: center; color: #555; font-size: 1rem; font-weight: bold;">
+                                Order
+                                ID</th>
+                            <th
+                                style="width: 20%; text-align: center; color: #555; font-size: 1rem; font-weight: bold;">
+                                Date
+                            </th>
+                            <th
+                                style="width: 15%; text-align: center; color: #555; font-size: 1rem; font-weight: bold;">
+                                Total
+                                Price</th>
+                            <th colspan="3"
+                                style="text-align: center; color: #555; font-size: 1rem; font-weight: bold;">Order
+                                Items</th>
+                        </tr>
+
+                    </thead>
+                    <!-- Table Body -->
+                    <tbody>
+                        <tr th:each="order : ${orderHistory}" style="border-bottom: 1px solid #ddd;">
+                            <!-- Order Details -->
+                            <td class="text-start align-start" th:text="${order.id}"
+                                style="font-weight: 600; color: #007bff;">1</td>
+                            <td class="text-start align-start"
+                                th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm:ss')}"
+                                style="color: #555;">
+                                2024-06-01</td>
+                            <td class="text-start align-start" th:text="${order.totalPrice + ' €'}"
+                                style="font-weight: bold; color: #28a745;">100.00 €</td>
+
+                            <!-- Nested Table for Items -->
+                            <td colspan="3" class="p-0" style="background-color: #eee;">
+                                <div class="p-3">Items:</div>
+                                <table class="table table-borderless mb-0">
+                                    <tr th:each="item : ${order.items}" style="border-bottom: 1px solid #f1f1f1;">
+                                        <td class="text-start align-start"
+                                            style="font-weight: 500; color: #333;width: 50%;"
+                                            th:text="${item.productName}">Product Name</td>
+                                        <td class="text-start align-start" style="color: #666; width: 20%;"
+                                            th:text="${'x' + item.quantity}">1
+                                        </td>
+                                        <td class="text-start align-start"
+                                            style="color: #dc3545; font-weight: bold;width: 30%;"
+                                            th:text="${item.price + ' €'}">0.00 €</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

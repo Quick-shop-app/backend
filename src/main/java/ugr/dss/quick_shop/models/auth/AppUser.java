@@ -1,31 +1,40 @@
-package ugr.dss.quick_shop.models;
+package ugr.dss.quick_shop.models.auth;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-public class RegisterDto {
-    @NotEmpty(message = "First name is required")
+import java.util.Date;
+
+@Entity
+@Table(name = "users")
+public class AppUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private String firstName;
-    
-    @NotEmpty(message = "Last name is required")
     private String lastName;
 
-    @NotEmpty(message = "Email is required")
-    @Email(message = "Invalid email")
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @NotEmpty(message = "Phone is required")
     private String phone;
-
-    @NotEmpty(message = "Address is required")
     private String address;
-
-    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
+    private String role;
+    private Date createdAt;
 
-    @Size(min = 6, message = "Password must be at least 6 characters long")
-    private String confirmPassword;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -75,11 +84,20 @@ public class RegisterDto {
         this.password = password;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public String getRole() {
+        return role;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setRole(String role) {
+        this.role = role;
     }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
 }
