@@ -3,6 +3,8 @@ package ugr.dss.quick_shop.controllers.api;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +30,10 @@ public class CartApiController {
      * @return
      */
     @GetMapping
-    public HashMap<String, Object> getCart(@RequestParam String username) {
+    public HashMap<String, Object> getCart() {
         HashMap<String, Object> response = new HashMap<>();
+        String username = getAuthenticatedUsername();
+
         if (username == null || username.isEmpty()) {
             response.put("error", "Invalid user");
             return response;
@@ -54,8 +58,9 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/add")
-    public HashMap<String, Object> addToCart(@RequestParam String username, @RequestParam Long productId,
+    public HashMap<String, Object> addToCart(@RequestParam Long productId,
             @RequestParam int quantity) {
+        String username = getAuthenticatedUsername();
         HashMap<String, Object> response = new HashMap<>();
         if (productId == null || quantity <= 0) {
             response.put("error", "Invalid product or quantity");
@@ -81,9 +86,11 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/remove")
-    public HashMap<String, Object> removeFromCart(@RequestParam String username,
+    public HashMap<String, Object> removeFromCart(
             @RequestParam Long productId) {
         HashMap<String, Object> response = new HashMap<>();
+        String username = getAuthenticatedUsername();
+
         if (username == null) {
             response.put("error", "User is not authenticated");
             return response;
@@ -102,8 +109,10 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/clear")
-    public HashMap<String, Object> clearCart(@RequestParam String username) {
+    public HashMap<String, Object> clearCart() {
+        String username = getAuthenticatedUsername();
         HashMap<String, Object> response = new HashMap<>();
+
         if (username == null) {
             response.put("error", "User is not authenticated");
             return response;
@@ -113,5 +122,16 @@ public class CartApiController {
         response.put("success", true);
         response.put("message", "Cart cleared");
         return response;
+    }
+
+    /**
+     * Utility method to get the currently authenticated username.
+     */
+    private String getAuthenticatedUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+        return auth.getName();
     }
 }
