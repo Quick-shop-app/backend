@@ -1,4 +1,4 @@
-# Quick Shop Admin Dashboard
+# Quick Shop
 
 Quick Shop is an e-commerce application designed for managing an online store. It provides functionalities for user authentication, product management, and shopping cart operations.
 This application includes server-side rendered (SSR) views and a REST API for every feature. 
