@@ -2,7 +2,6 @@ package ugr.dss.quick_shop.models.product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +23,6 @@ public class ProductDto {
     @Size(max = 1000, message = "Description must be at most 1000 characters long")
     private String description;
 
-    @NotNull(message = "Image is required")
     private MultipartFile imageFile;
 
     public String getName() {
