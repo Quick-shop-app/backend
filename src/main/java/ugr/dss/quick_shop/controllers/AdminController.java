@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +28,7 @@ import ugr.dss.quick_shop.models.product.Product;
 import ugr.dss.quick_shop.models.product.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
 import ugr.dss.quick_shop.services.ProductsRepository;
+import ugr.dss.quick_shop.utils.FileUploadUtil;
 
 @Controller
 @RequestMapping("/admin")
@@ -49,7 +49,7 @@ public class AdminController {
      */
     @GetMapping({ "", "/", "/index" })
     public String showProductsPage(Model model) {
-        List<Product> products = productsRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        List<Product> products = productsRepository.findAllActiveProducts();
         model.addAttribute("products", products);
         return "admin/index";
     }
@@ -83,21 +83,12 @@ public class AdminController {
 
         MultipartFile imageFile = productDto.getImageFile();
         Date createdDate = new Date();
-        String fileName = createdDate.getTime() + "_product_" + imageFile.getOriginalFilename();
+        String fileName = null;
         try {
-            String uploadDir = "public/images/";
-            Path uploadPath = Paths.get(uploadDir);
-
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            try (InputStream inputStream = imageFile.getInputStream()) {
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
+            fileName = FileUploadUtil.saveImage(imageFile, createdDate);
         } catch (IOException e) {
             System.out.println("Error saving image file: " + e.getMessage());
+            return "admin/product/create";
         }
 
         Product product = new Product();
@@ -166,30 +157,14 @@ public class AdminController {
             }
 
             if (!productDto.getImageFile().isEmpty() && productDto.getImageFile() != null) {
-                MultipartFile imageFile = productDto.getImageFile();
-                String fileName = updatedAt.getTime() + "_product_" + imageFile.getOriginalFilename();
                 try {
-                    String uploadDir = "public/images/";
-                    Path uploadPath = Paths.get(uploadDir);
-
-                    if (!Files.exists(uploadPath)) {
-                        Files.createDirectories(uploadPath);
-                    }
-
-                    try (InputStream inputStream = imageFile.getInputStream()) {
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-                    }
-
-                    String oldImage = product.getImage();
-                    if (oldImage != null && !oldImage.isEmpty()) {
-                        Path oldFilePath = uploadPath.resolve(oldImage);
-                        Files.delete(oldFilePath);
-                    }
+                    MultipartFile imageFile = productDto.getImageFile();
+                    String fileName = FileUploadUtil.replaceImage(imageFile, imageFile.getOriginalFilename(),
+                            updatedAt);
+                    product.setImage(fileName);
                 } catch (IOException e) {
                     System.out.println("Error saving image file: " + e.getMessage());
                 }
-                product.setImage(fileName);
             }
 
             product.setId(id);
@@ -218,14 +193,9 @@ public class AdminController {
     public String deleteProduct(@RequestParam("id") Long id) {
         try {
             Product product = productsRepository.findById(id).get();
-            String image = product.getImage();
-            if (image != null && !image.isEmpty()) {
-                String uploadDir = "public/images/";
-                Path uploadPath = Paths.get(uploadDir);
-                Path filePath = uploadPath.resolve(image);
-                Files.delete(filePath);
-            }
-            productsRepository.deleteById(id);
+
+            product.setActive(false);
+            productsRepository.save(product);
         } catch (Exception e) {
             System.out.println("Error deleting product: " + e.getMessage());
         }
