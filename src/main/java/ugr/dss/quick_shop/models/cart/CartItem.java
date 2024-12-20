@@ -1,7 +1,6 @@
 package ugr.dss.quick_shop.models.cart;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import ugr.dss.quick_shop.models.product.Product;

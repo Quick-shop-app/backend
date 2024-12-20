@@ -28,6 +28,8 @@ public class Product {
     private Date updatedAt;
     private String image;
 
+    private boolean active = true;
+
     public Long getId() {
         return id;
     }
@@ -98,6 +100,14 @@ public class Product {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     @Override
