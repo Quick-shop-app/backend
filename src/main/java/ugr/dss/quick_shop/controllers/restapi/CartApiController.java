@@ -3,6 +3,7 @@ package ugr.dss.quick_shop.controllers.restapi;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,23 +35,28 @@ public class CartApiController {
      * @return
      */
     @GetMapping
-    public HashMap<String, Object> getCart() {
+    public ResponseEntity<HashMap<String, Object>> getCartItems() {
         HashMap<String, Object> response = new HashMap<>();
         String username = getAuthenticatedUsername();
 
         if (username == null || username.isEmpty()) {
             response.put("error", "Invalid user");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         Cart cart = cartService.getCartForUser(username);
         if (cart == null) {
             response.put("error", "Cart not found");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
         response.put("data", cart.getItems().toArray());
         response.put("count", cart.getItems().size());
-        return response;
+        // total price
+        double totalPrice = cart.getItems().stream()
+                .mapToDouble(item -> item.getTotalPrice())
+                .sum();
+        response.put("totalPrice", totalPrice);
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -61,24 +67,25 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/add")
-    public HashMap<String, Object> addToCart(@RequestParam Long productId,
+    public ResponseEntity<HashMap<String, Object>> addToCart(
+            @RequestParam Long productId,
             @RequestParam int quantity) {
         String username = getAuthenticatedUsername();
         HashMap<String, Object> response = new HashMap<>();
         if (productId == null || quantity <= 0) {
             response.put("error", "Invalid product or quantity");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         if (username == null) {
             response.put("error", "User is not authenticated");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         cartService.addToCart(username, productId, quantity);
         response.put("success", true);
         response.put("message", "Item added to cart");
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -88,20 +95,21 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/remove")
-    public HashMap<String, Object> removeFromCart(
+    public ResponseEntity<HashMap<String, Object>> removeFromCart(
             @RequestParam Long productId) {
         HashMap<String, Object> response = new HashMap<>();
         String username = getAuthenticatedUsername();
 
         if (username == null) {
             response.put("error", "User is not authenticated");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         cartService.removeFromCart(username, productId);
         response.put("success", true);
         response.put("message", "Item removed from cart");
-        return response;
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -110,19 +118,19 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/clear")
-    public HashMap<String, Object> clearCart() {
+    public ResponseEntity<HashMap<String, Object>> clearCart() {
         String username = getAuthenticatedUsername();
         HashMap<String, Object> response = new HashMap<>();
 
         if (username == null) {
             response.put("error", "User is not authenticated");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         cartService.clearCart(username);
         response.put("success", true);
         response.put("message", "Cart cleared");
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -142,19 +150,19 @@ public class CartApiController {
      * @return
      */
     @PostMapping("/finalize")
-    public HashMap<String, Object> finalizeCart() {
+    public ResponseEntity<HashMap<String, Object>> finalizeCart() {
         String username = getAuthenticatedUsername();
         HashMap<String, Object> response = new HashMap<>();
 
         if (username == null) {
             response.put("error", "User is not authenticated");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         Cart cart = cartService.getCartForUser(username);
         if (cart.getItems().isEmpty()) {
             response.put("error", "Cart is empty");
-            return response;
+            return ResponseEntity.badRequest().body(response);
         }
 
         Order order = orderService.createOrderFromCart(cart);
@@ -162,7 +170,7 @@ public class CartApiController {
         response.put("data", order);
         response.put("success", true);
         response.put("message", "Order created successfully");
-        return response;
+        return ResponseEntity.ok(response);
     }
 
 }

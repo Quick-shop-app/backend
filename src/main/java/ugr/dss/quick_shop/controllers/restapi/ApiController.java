@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ugr.dss.quick_shop.models.product.Product;
-import ugr.dss.quick_shop.services.ProductsRepository;
+import ugr.dss.quick_shop.repositories.ProductsRepository;
 
 @RestController
 @CrossOrigin(origins = "*")
