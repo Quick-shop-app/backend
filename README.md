@@ -6,7 +6,15 @@ This application includes server-side rendered (SSR) views and a REST API for ev
 ---
 
 ## Features
+### Home Page 
+- view products.
+- add products to cart.
 
+### Cart Page
+- remove from cart
+- finalize order
+- view order history
+  
 ### Admin Dashboard
 - View, create, update, and delete products.
 - Soft delete functionality for products (inactive products are hidden from public view).
