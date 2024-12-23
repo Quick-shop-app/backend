@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 import ugr.dss.quick_shop.models.product.Product;
 import ugr.dss.quick_shop.models.product.ProductDto;
 import ugr.dss.quick_shop.services.DatabaseExportService;
-import ugr.dss.quick_shop.services.ProductsRepository;
+import ugr.dss.quick_shop.repositories.ProductsRepository;
 import ugr.dss.quick_shop.utils.FileUploadUtil;
 
 @RestController

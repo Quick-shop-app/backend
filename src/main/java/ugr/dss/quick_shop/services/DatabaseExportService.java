@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ugr.dss.quick_shop.models.product.Product;
+import ugr.dss.quick_shop.repositories.ProductsRepository;
 
 import java.util.List;
 
