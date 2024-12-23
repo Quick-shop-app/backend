@@ -9,6 +9,7 @@ import ugr.dss.quick_shop.models.cart.CartItem;
 import ugr.dss.quick_shop.models.product.Product;
 import ugr.dss.quick_shop.repositories.AppUserRepository;
 import ugr.dss.quick_shop.repositories.CartRepository;
+import ugr.dss.quick_shop.repositories.ProductsRepository;
 
 import java.util.Optional;
 

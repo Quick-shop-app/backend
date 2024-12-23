@@ -1,4 +1,4 @@
-package ugr.dss.quick_shop.services;
+package ugr.dss.quick_shop.repositories;
 
 import java.util.List;
 
